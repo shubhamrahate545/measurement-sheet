@@ -88,13 +88,16 @@ def generate_pdf():
        # Clean up: Delete the generated PDF file
        if os.path.exists(PDF_FILENAME):
            os.remove(PDF_FILENAME)
+import os
+from flask import Flask, render_template
+
 app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return render_template("index.html")  # Ensure "index.html" exists
+    return render_template("index.html")  # Ensure "index.html" exists in the same folder
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Get Render's port
-    app.run(host="0.0.0.0", port=port)
+    port = int(os.environ.get("PORT", 5000))  # Use Render's provided port, default to 5000
+    app.run(host="0.0.0.0", port=port)  # Bind to all network interfaces
    app.run(debug=True)
