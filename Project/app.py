@@ -88,7 +88,10 @@ def generate_pdf():
        # Clean up: Delete the generated PDF file
        if os.path.exists(PDF_FILENAME):
            os.remove(PDF_FILENAME)
+def home():
+    return render_template("index.html")  # Ensure "index.html" is present
+
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Use Render's provided port, default to 5000
+    port = int(os.environ.get("PORT", 5000))  # Use Render's assigned port
     app.run(host="0.0.0.0", port=port)
    app.run(debug=True)
