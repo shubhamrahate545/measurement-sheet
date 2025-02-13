@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ducting & Installation Measurement Sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Include jsPDF & AutoTable -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<style>
+       /* Your existing CSS styles */
+       body {
+           font-family: 'Poppins', sans-serif;
+           background-color: #f4f7fc;
+           margin: 0;
+           padding: 20px;
+           display: flex;
+           justify-content: center;
+           align-items: center;
+           min-height: 100vh;
+       }
+       .container {
+           background: #ffffff;
+           padding: 30px;
+           border-radius: 12px;
+           box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+           width: 90%;
+           max-width: 700px;
+       }
+       .header {
+           text-align: center;
+           margin-bottom: 20px;
+       }
+       .logo {
+           width: 120px;
+           margin-bottom: 10px;
+       }
+       h1, h3, h4 {
+           color: #2c3e50;
+           margin: 5px 0;
+       }
+       h2 {
+           color: #007bff;
+           font-size: 20px;
+           font-weight: bold;
+           margin-top: 15px;
+           text-align: center;
+       }
+       label {
+           font-weight: 500;
+           color: #2c3e50;
+       }
+       input, select, button {
+           width: 100%;
+           padding: 10px;
+           margin: 5px 0 15px;
+           border: 1px solid #ddd;
+           border-radius: 6px;
+           font-size: 14px;
+           box-sizing: border-box;
+       }
+       button {
+           background-color: #007bff;
+           color: white;
+           border: none;
+           cursor: pointer;
+           font-weight: bold;
+           transition: background-color 0.3s;
+       }
+       button:hover {
+           background-color: #0056b3;
+       }
+       .project-details, .measurement-details {
+           padding: 15px;
+           background: #f9f9f9;
+           border-radius: 8px;
+       }
+       ul {
+           list-style-type: none;
+           padding: 0;
+       }
+       li {
+           background: #ecf0f1;
+           padding: 10px;
+           border-radius: 5px;
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+       }
+       .delete-btn {
+           background-color: #ff4d4d;
+           color: white;
+           border: none;
+           padding: 3px 10px;
+           border-radius: 4px;
+           cursor: pointer;
+           font-size: 12px;
+           width: 30px;
+           text-align: center;
+       }
+       .delete-btn:hover {
+           background-color: #cc0000;
+       }
+       .other-input {
+           display: none;
+           margin-top: 10px;
+       }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<img src="static/logo.png" alt="Company Logo" class="logo">
+<h1>NEW SAI ENTERPRISES</h1>
+<h3>Angad Ghoshir</h3>
+<h4>Mo.: 9112092309</h4>
+<h4>Address: Pune, Maharashtra</h4>
+</div>
+<h2>Ducting & Installation Measurement Sheet</h2>
+<div class="project-details">
+<label for="project_name">Project Name:</label>
+<input type="text" id="project_name">
+<label for="client_name">Client Name:</label>
+<input type="text" id="client_name">
+<label for="building_details">Building Details:</label>
+<input type="text" id="building_details">
+<label for="date">Date:</label>
+<input type="date" id="date">
+</div>
+<h3>Measurement Details</h3>
+<div class="measurement-details">
+<label for="measurement">Measurement:</label>
+<input type="text" id="measurement">
+<label for="type">Type:</label>
+<select id="type" onchange="handleTypeChange()">
+<option value="STP">STP</option>
+<option value="D/E">D/E</option>
+<option value="PLEMBOX">PLEMBOX</option>
+<option value="CANWAS">CANWAS</option>
+<option value="Other">Other</option>
+</select>
+<input type="text" id="otherType" class="other-input" placeholder="Enter custom type">
+<label for="length">Length:</label>
+<input type="text" id="length">
+<label for="qty">Quantity:</label>
+<input type="text" id="qty">
+<label for="area">Area:</label>
+<input type="text" id="area">
+<label for="unitDropdown">Unit:</label>
+<select id="unitDropdown">
+<option value="Sq. Ft.">Sq. Ft.</option>
+<option value="Sq. Mtr.">Sq. Mtr.</option>
+</select>
+<button onclick="addRecord()">Add Record</button>
+</div>
+<h3>Submitted Records</h3>
+<ul id="recordList"></ul>
+<button onclick="generatePDF()">Generate PDF</button>
+</div>
+
+<script>
+let records = JSON.parse(localStorage.getItem('records')) || [];
+
+document.addEventListener('DOMContentLoaded', updateRecordList);
+
+function handleTypeChange() {
+    document.getElementById('otherType').style.display = document.getElementById('type').value === 'Other' ? 'block' : 'none';
+}
+
+function addRecord() {
+    const measurement = document.getElementById('measurement').value.trim();
+    const type = document.getElementById('type').value === 'Other' ? document.getElementById('otherType').value.trim() : document.getElementById('type').value;
+    const length = document.getElementById('length').value.trim();
+    const qty = document.getElementById('qty').value.trim();
+    const area = document.getElementById('area').value.trim();
+    const unit = document.getElementById('unitDropdown').value;
+
+    if (!measurement || !type || !length || !qty || !area) {
+        alert('Please fill all fields.');
+        return;
+    }
+
+    records.push({ measurement, type, length, qty, area, unit });
+    saveRecords();
+    updateRecordList();
+}
+
+function updateRecordList() {
+    document.getElementById('recordList').innerHTML = records.map((rec, i) =>
+        `<li>${i + 1}. ${rec.measurement} - ${rec.type} - ${rec.length} - ${rec.qty} - ${rec.area} ${rec.unit}
+        <button class="delete-btn" onclick="deleteRecord(${i})">X</button></li>`).join('');
+}
+
+function deleteRecord(index) {
+    records.splice(index, 1);
+    saveRecords();
+    updateRecordList();
+}
+
+function saveRecords() {
+    localStorage.setItem('records', JSON.stringify(records));
+}
+
+function generatePDF() {
+    const { jsPDF } = window.jspdf;
+    if (!jsPDF) {
+        alert("Error: jsPDF library not loaded.");
+        return;
+    }
+
+    const doc = new jsPDF();
+
+    // Firm Details - Professional Billing Header
+    const img = new Image();
+    img.src = "static/logo.png"; // Ensure this path is correct
+
+    doc.addImage(img, 'PNG', 10, 10, 30, 20); // Align logo properly
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text("NEW SAI ENTERPRISES", 45, 15);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text("Angad Ghoshir", 45, 22);
+    doc.text("Mo.: 9112092309", 45, 27);
+    doc.text("Address: Pune, Maharashtra", 45, 32);
+
+    // Project Details - Two-Column Layout
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text("Project Details", 10, 50);
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Project Name: ${document.getElementById('project_name').value || "-"}`, 10, 58);
+    doc.text(`Date: ${document.getElementById('date').value || "-"}`, 140, 58);
+    doc.text(`Client Name: ${document.getElementById('client_name').value || "-"}`, 10, 65);
+    doc.text(`Building Details: ${document.getElementById('building_details').value || "-"}`, 140, 65);
+
+    let startY = 80;
+    if (records.length === 0) {
+        doc.text("No measurement records available.", 10, startY);
+    } else {
+        let totalLength = 0, totalQty = 0, totalArea = 0;
+        let unitType = ""; // Store unit type from the last record
+
+        // Sum all numeric columns
+        records.forEach(record => {
+            totalLength += parseFloat(record.length) || 0;
+            totalQty += parseFloat(record.qty) || 0;
+            totalArea += parseFloat(record.area) || 0;
+            unitType = record.unit; // Assuming all rows have the same unit
+        });
+
+        // Generate Table with Records
+        const tableColumns = ['Sr. No.', 'Measurement', 'Type', 'Length', 'Qty', 'Area', 'Unit'];
+        const tableRows = records.map((record, i) => [
+            i + 1,
+            record.measurement,
+            record.type,
+            record.length,
+            record.qty,
+            record.area,
+            record.unit
+        ]);
+
+        // Add Total Row at the Bottom
+        tableRows.push([
+            "Total",  // Sr. No.
+            "",       // Measurement (Blank)
+            "",       // Type (Blank)
+            totalLength.toFixed(2),  // Sum of Length
+            totalQty.toFixed(2),     // Sum of Qty
+            totalArea.toFixed(2),     // Sum of Area (Without Unit)
+            unitType                  // Unit Column
+        ]);
+
+        // Generate Table with Proper Styling
+        doc.autoTable({
+            startY: startY,
+            head: [tableColumns],
+            body: tableRows,
+            theme: 'grid',
+            styles: { fontSize: 10, cellPadding: 3 },
+            headStyles: { fillColor: [0, 122, 204], textColor: [255, 255, 255], fontStyle: 'bold' },
+            bodyStyles: {
+                textColor: [0, 0, 0], // Default text color for body rows
+                fillColor: [255, 255, 255], // Keep all rows white
+                fontStyle: 'normal'
+            },
+            didParseCell: function (data) {
+                if (data.row.index === records.length) { // Last row (Total row)
+                    data.cell.styles.fillColor = [0, 122, 204]; // Blue background
+                    data.cell.styles.textColor = [255, 255, 255]; // White text
+                    data.cell.styles.fontStyle = 'bold'; // Bold text
+                }
+            },
+            margin: { top: 20 }
+        });
+    }
+
+    // Save PDF
+    doc.save("Measurement_Sheet.pdf");
+}
+
+
+</script>
+</body>
+</html>
