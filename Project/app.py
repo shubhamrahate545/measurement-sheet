@@ -1,7 +1,14 @@
 from flask import Flask, request, send_file, render_template, jsonify
 from fpdf import FPDF
-import os
 app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return render_template("index.html")  # Ensure "index.html" exists in the same folder
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))  # Use Render's provided port, default to 5000
+    app.run(host="0.0.0.0", port=port)  # Bind to all network interfaces
 # Constants
 LOGO_PATH = os.path.join('static', 'logo.png')
 PDF_FILENAME = "Ducting_Measurement_Sheet.pdf"
@@ -91,13 +98,4 @@ def generate_pdf():
 import os
 from flask import Flask, render_template
 
-app = Flask(__name__)
-
-@app.route("/")
-def home():
-    return render_template("index.html")  # Ensure "index.html" exists in the same folder
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Use Render's provided port, default to 5000
-    app.run(host="0.0.0.0", port=port)  # Bind to all network interfaces
    app.run(debug=True)
